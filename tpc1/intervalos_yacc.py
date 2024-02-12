@@ -9,18 +9,19 @@
 import sys
 import ply.yacc as yacc
 from intervalos_lex import tokens
+from textwrap import dedent # remove indent
 
 # The set of syntatic rules
 def p_sequencia(p):
     "sequencia : sentido intervalos"
     if parser.success:
-        p[0] = f"""
+        output = f"""
                 Número de intervalos: {parser.count}
                 Comprimento de cada intrervalo: {p[2]}
                 Intervalo mais longo: {max(p[2])}
                 Intervalo mais curto: {min(p[2])}
-                Amplitude: {parser.amplitude}
-                """
+                Amplitude: {parser.amplitude}"""
+        p[0] = dedent(output)
     else:
         p[0] = "Erro no formato, por favor corrige"
     print(p[0])
@@ -47,41 +48,27 @@ def p_intervalo(p):
     "intervalo : '[' NUM ',' NUM ']'"
     if parser.last:
         if parser.flag:
-            if p[2] < p[4] and p[2] > parser.last:
-                parser.last = p[4]
-                parser.amplitude = abs(p[4] - parser.first)
-                parser.count += 1
-                p[0] = abs(p[2] - p[4])
-            else:
+            if not (p[2] < p[4] and p[2] > parser.last):
                 parser.success = False
         else:
-            if p[2] > p[4] and p[2] < parser.last:
-                parser.last = p[4]
-                parser.amplitude = abs(p[4] - parser.first)
-                parser.count += 1
-                p[0] = abs(p[2] - p[4])
-            else:
+            if not (p[2] > p[4] and p[2] < parser.last):
                 parser.success = False
     else:
         if parser.flag:
             if p[2] < p[4]:
-                parser.last = p[4]
-                parser.first = p[2]
-                parser.amplitude = abs(p[4] - parser.first)
-                parser.count += 1
-                p[0] = abs(p[2] - p[4])
+                parser.first = p[2]    
             else:
                 parser.success = False
         else:
             if p[2] > p[4]:
-                parser.last = p[4]
-                parser.first = p[2]
-                parser.amplitude = abs(p[4] - parser.first)
-                parser.count += 1
-                p[0] = abs(p[2] - p[4])
+                parser.first = p[2] 
             else:
                 parser.success = False
-
+    
+    parser.last = p[4]
+    parser.amplitude = abs(p[4] - parser.first)
+    parser.count += 1
+    p[0] = abs(p[2] - p[4])
 
 
 # Syntatic Error handling rule
