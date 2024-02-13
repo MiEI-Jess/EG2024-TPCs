@@ -54,15 +54,13 @@ def p_intervalo(p):
             if not (p[2] > p[4] and p[2] < parser.last):
                 parser.success = False
     else:
+        parser.first = p[2] 
+        
         if parser.flag:
-            if p[2] < p[4]:
-                parser.first = p[2]    
-            else:
+            if not (p[2] < p[4]):
                 parser.success = False
         else:
-            if p[2] > p[4]:
-                parser.first = p[2] 
-            else:
+            if not (p[2] > p[4]):
                 parser.success = False
     
     parser.last = p[4]
