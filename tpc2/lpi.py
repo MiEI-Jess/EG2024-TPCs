@@ -9,14 +9,15 @@ expressao: atribuicao
          | condicional 
          | ciclo
 
-atribuicao: var "=" [tipo|operacao]
-operacao: termo operador termo (operacao)*
+atribuicao:tipo var "=" [objeto|operacao]
+operacao: termo operador termo
+        | termo operador (operacao)+ 
 
 condicional: alternativa 
            | casos
 alternativa: IF PE condicao PD CE expressao+ CD 
 		   | IF PE condicao PD CE expressao+ CD ELSE CE expressao+ CD
-casos: "match" PE var PD CE "case" tipo DP expressao* "case" "_" DP expressao* CD
+casos: "match" PE var PD CE "case" objeto DP expressao* "case" "_" DP expressao* CD
 
 ciclo: enquanto 
      | repete 
@@ -32,17 +33,17 @@ bool: "TRUE"
     | "FALSE"
 
 int : NUMBER
-string: STRING
-tuplo: PE tipo [VIR tipo]* PD
+string: STR
+tuplo: PE objeto [VIR objeto]* PD
 array: PRE  PRD 
-     | PRE tipo PRD 
-     | PRE tipo (VIR tipo)* PRD
+     | PRE objeto PRD 
+     | PRE objeto (VIR objeto)* PRD
 lista: PRE PRD 
-     | PRE tipo lista PRD
+     | PRE objeto lista PRD
 set: CE CD 
-   | CE tipo CD 
-   | CE tipo VIR set* CD
-tipo: int
+   | CE objeto CD 
+   | CE objeto VIR set* CD
+objeto: int
     | bool 
     | string 
     | tuplo 
@@ -57,19 +58,25 @@ conjunto: array
         | set 
         | lista
      
-operador: "+" 
-        | "-" 
-        | "*" 
-        | "/" 
-        | "%" 
-        | "==" 
-        | "!=" 
-        | "<" 
-        | ">" 
-        | "<=" 
-        | ">="
-        | "="
+operador: PLUS 
+        | MINUS 
+        | MULT
+        | DIV
+        | MOD 
+        | EQUAL 
+        | DIFF 
+        | LESS 
+        | GREAT 
+        | LEQUAL 
+        | GEQUAL
 
+tipo: INT
+    | BOOL
+    | STRING
+    | TUPLO 
+    | ARRAY 
+    | LISTA 
+    | SET
 
 //Regras Lexicograficas
 DP: ":"
@@ -83,18 +90,37 @@ CD: "}"
 IF: "if"
 ELSE: "else"
 CASE: "case"
+INT: "int"
+BOOL: "bool" 
+STRING: "string"
+TUPLO: "tuplo" 
+ARRAY: "array" 
+LISTA: "lista" 
+SET: "set"
+PLUS: "+" 
+MINUS: "-" 
+MULT: "*" 
+DIV: "/" 
+MOD: "%" 
+EQUAL: "==" 
+DIFF: "!=" 
+LESS: "<" 
+GREAT: ">" 
+LEQUAL:"<=" 
+GEQUAL:">="
 NUMBER: /\-?\d+/
-STRING: /\"\w+\"/
+STR: /\"\w+\"/
+
 
 %import common.WS_INLINE
 %ignore WS_INLINE
 """
 
-frase = "while(TRUE){x+1}"
+frase = "int x = 10 + 23"
 
 p = Lark(grammar)
 
 tree = p.parse(frase)
-#print(tree)
+print(tree)
 print(tree.pretty())
-#pydot__tree_to_png(tree,'lark_test.png')
+pydot__tree_to_png(tree,'lark_test.png')
