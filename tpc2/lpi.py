@@ -42,7 +42,7 @@ array: PRE  PRD
      | PRE objeto PRD 
      | PRE objeto (VIR objeto)* PRD
 lista: PRE PRD 
-     | PRE objeto lista PRD
+     | PRE objeto lista* PRD
 set: CE CD 
    | CE objeto CD 
    | CE objeto VIR set* CD
@@ -117,9 +117,14 @@ SC: ";"
 
 %import common.WS_INLINE
 %ignore WS_INLINE
+%ignore "\\n"
 """
 
-frase = "int y; int x = 10 + 23; x = 10;"
+frase = """
+int y; 
+int x = 10 + 23; 
+x = 10;
+"""
 
 p = Lark(grammar)
 
