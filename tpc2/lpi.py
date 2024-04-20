@@ -1,15 +1,18 @@
 from lark import Lark
-from lark.tree import pydot__tree_to_png
 
 grammar = """
 //Regras Semanticas
-start: expressao
+start: (expressao SC)+
 expressao: atribuicao 
+         |declaracao
+         | inicializacao
          | operacao 
          | condicional 
          | ciclo
 
-atribuicao:tipo var "=" [objeto|operacao]
+declaracao: tipo var
+inicializacao: tipo var "=" [objeto|operacao]
+atribuicao: var "=" [objeto|operacao]
 operacao: termo operador termo
         | termo operador (operacao)+ 
 
@@ -110,17 +113,16 @@ LEQUAL:"<="
 GEQUAL:">="
 NUMBER: /\-?\d+/
 STR: /\"\w+\"/
-
+SC: ";" 
 
 %import common.WS_INLINE
 %ignore WS_INLINE
 """
 
-frase = "int x = 10 + 23"
+frase = "int y; int x = 10 + 23; x = 10;"
 
 p = Lark(grammar)
 
 tree = p.parse(frase)
 print(tree)
 print(tree.pretty())
-pydot__tree_to_png(tree,'lark_test.png')
